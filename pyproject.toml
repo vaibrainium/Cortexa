@@ -1,7 +1,7 @@
 [project]
 name = "cortexa"
 version = "0.1.0"
-description = "Add your description here"
+description = "Domain-tuned LLM research assistant for decision neuroscience"
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
@@ -9,24 +9,75 @@ authors = [
     {name = "Anirban Sharma", email = "anirbansharma007@gmail.com"},
 ]
 license = {text = "MIT"}
+
+# Core deps — only things NOT already in the Walker Lab base image
+# Already provided by base: numpy, scipy, scikit-learn, pandas, matplotlib,
+# seaborn, numpyro, pymc, jax, build-essential, curl, git, fish, uv
 dependencies = [
+    "python-dotenv",
+    "omegaconf>=2.3.0",
+    "requests",
+    "tqdm",
+    "paperscraper>=0.2.15",   # arXiv + PubMed + bioRxiv scraping
     "ipykernel",
     "ipywidgets",
-    "langchain",
-    "langchain-community",
-    "langchain-core",
-    "matplotlib",
-    "numpy",
-    "omegaconf>=2.3.0",
-    "pandas",
-    "paperscraper>=0.2.15",
-    "pathlib2",
     "polars>=1.23.0",
-    "python-dotenv",
-    "scikit-learn",
-    "scipy",
-    "seaborn",
-    "transformers",
+]
+
+[project.optional-dependencies]
+
+# ── Dev: parsing, embedding, RAG, UI ────────────────────────────────────────
+dev = [
+    # paper parsing
+    "llama-parse==0.5.14",
+
+    # embeddings + vector store
+    "sentence-transformers>=3.3.1",
+    "qdrant-client>=1.11.3",
+
+    # RAG orchestration
+    "langchain>=0.3.7",
+    "langchain-community>=0.3.7",
+    "langchain-core",
+
+    # transformers (inference)
+    "transformers>=4.40.0,<5.0.0",
+    "huggingface-hub>=0.26.2",
+    "datasets>=3.1.0",
+
+    # UI
+    "gradio>=5.6.0",
+
+    # eval
+    "bert-score>=0.3.13",
+
+    # fetch papers and convert to markdown
+    "onnxruntime==1.19.2",
+    "pymupdf4llm>=1.27.2.2",
+    "tiktoken>=0.12.0",
+
+    # deep learning runtime
+    "torch>=2.0.0",
+]
+
+# ── Train: QLoRA fine-tuning ─────────────────────────────────────────────────
+train = [
+    "unsloth",
+    "peft>=0.10.0",
+    "trl>=0.8.6",
+    "bitsandbytes>=0.43.0",
+    "accelerate>=0.29.0",
+    "transformers>=4.40.0,<5.0.0",
+    "datasets>=3.1.0",
+    "huggingface-hub>=0.26.2",
+    "wandb",
+    "flagembedding>=1.3.5"
+]
+
+# ── All: convenience for single-machine installs ─────────────────────────────
+all = [
+    "cortexa[dev]",
+    "cortexa[train]",
 ]
 
 [build-system]

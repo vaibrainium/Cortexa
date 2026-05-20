@@ -5,16 +5,29 @@ services:
     env_file: .env
     ports:
       - "${JUPYTER_PORT}:8811"
+      - "${GRADIO_PORT:-7860}:7860"
     environment:
       - "JUPYTER_PASSWORD=${JUPYTER_PASSWORD}"
     volumes:
       - ./:/src/
       - "${DATAPATH}:/mnt/data"
+    # # run in interactive mode to keep the container alive and allow access to the shell
+    # stdin_open: true
+    # tty: true
 
-    command: sleep infinity; nvidia-smi
+    command: >
+      bash -c "uv sync --extra dev --extra train && sleep infinity"
+
     deploy:
       resources:
         reservations:
           devices:
             - driver: nvidia
               capabilities: [gpu]
+
+  qdrant:
+    image: qdrant/qdrant:v1.12.1
+    ports:
+      - "6333:6333"
+    volumes:
+      - "${DATAPATH}/embeddings:/qdrant/storage"
